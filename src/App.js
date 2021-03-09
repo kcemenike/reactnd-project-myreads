@@ -1,9 +1,16 @@
 import React, { Component } from "react";
 // import * as BooksAPI from './BooksAPI'
 import "./App.css";
-import { Link, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
+import { books } from "./Data";
 
 class BooksApp extends React.Component {
+  shelves = [
+    { id: 1, shelf: "currentlyReading", friendlyName: "Currently Reading" },
+    { id: 2, shelf: "wantToRead", friendlyName: "Want to Read" },
+    { id: 3, shelf: "read", friendlyName: "Read" },
+  ];
+
   state = {
     /**
      * TODO: Instead of using this state variable to keep track of which page
@@ -12,13 +19,26 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     showSearchPage: false,
+    books: books,
   };
 
   render() {
+    const { books } = this.state;
+    // console.log(this.shelves);
+    // console.log(books);
     return (
       <div className="app">
-        <Route exact path="/" component={BookList} />
-        <Route exact path="/search" component={BookSearch} />
+        <Route
+          exact
+          path="/"
+          render={() => <BookList shelves={this.shelves} books={books} />}
+        />
+        <Route
+          exact
+          path="/search"
+          render={() => <BookSearch books={books} />}
+        />
+
         {this.state.showSearchPage ? (
           <div className="search-books">
             <div className="search-books-bar">
@@ -306,15 +326,120 @@ class BooksApp extends React.Component {
 
 class BookList extends Component {
   render() {
-    // render a bookshelf component (props will be 'currently reading', 'want to read' and 'read')
-    const { bookshelf } = this.props;
+    // render a shelves component (props will be 'currently reading', 'want to read' and 'read', and books)
+    const { shelves, books } = this.props;
+    // console.log(this.props);
     return (
       <div className="list-books">
         <h1>MyReads</h1>
+        <BooksContent shelves={shelves} books={books} />
+        <BookSearch />
       </div>
     );
   }
 }
+
+const BooksContent = (props) => {
+  // get shelves and their books (if any)
+  const { shelves, books } = props;
+  // console.log("BooksContent", props);
+  return (
+    <div className="list-books-content">
+      <div>
+        List of Books
+        {shelves.map((shelf) => (
+          <BookShelf key={shelf.id} books={books} bookshelf={shelf} />
+        ))}
+      </div>
+    </div>
+  );
+};
+const BookShelf = (props) => {
+  // Get all books and the bookshelf from props
+  const { books, bookshelf } = props;
+  // console.log(props);
+  // Filter the books in the bookshelf
+  const booksFiltered = books.filter((book) => book.shelf === bookshelf.shelf);
+  // console.log(booksFiltered);
+  return (
+    <div className="bookshelf">
+      <h2 className="bookshelf-title">{bookshelf.friendlyName}</h2>
+      <div className="bookshelf-books">
+        <ol className="books-grid">
+          {booksFiltered.map((book) => (
+            <Book key={book.id} book={book} bookshelf={bookshelf.shelf} />
+          ))}
+        </ol>
+      </div>
+    </div>
+  );
+};
+
+const Book = (props) => {
+  const { book, bookshelf } = props;
+  // console.log(props);
+  return (
+    <li>
+      <div className="book">
+        <div className="book-top">
+          <div
+            className="book-cover"
+            style={{
+              width: 128,
+              height: 192,
+              backgroundImage: `url(${book.imageLinks.smallThumbnail})`,
+            }}
+          />
+          <BookshelfChange book={book} bookshelf={bookshelf} />
+        </div>
+        <div className="book-title">{book.title}</div>
+        <div className="book-authors">
+          {book.authors.length === 1
+            ? book.authors[0]
+            : book.authors[0] + " et al."}
+        </div>
+      </div>
+    </li>
+  );
+};
+
+class BookshelfChange extends Component {
+  // console.log(this.props);
+  // state stores current shelf
+  state = {
+    shelf: this.props.bookshelf,
+    book: this.props.book,
+  };
+  onChange = (e) => {
+    e.preventDefault();
+    // Change shelf type
+    this.setState({
+      shelf: e.target.value,
+    });
+    // console.log(e.target.value);
+    // console.log(this.state.shelf);
+
+    // Move book
+    //TODO: Move book
+  };
+
+  render() {
+    return (
+      <div className="book-shelf-changer">
+        <select value={this.state.shelf} onChange={this.onChange}>
+          <option value="move" disabled>
+            Move to...
+          </option>
+          <option value="currentlyReading">Currently Reading</option>
+          <option value="wantToRead">Want to Read</option>
+          <option value="read">Read</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+    );
+  }
+}
+
 class BookSearch extends Component {
   render() {
     return <div className="search-books">booksearch</div>;
