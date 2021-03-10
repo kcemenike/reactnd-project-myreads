@@ -21,6 +21,22 @@ class BooksApp extends React.Component {
     showSearchPage: false,
     books: books,
   };
+  // I thought about adding this move method to the BookList,
+  // But I need the move method to also be available for Search
+  // So the move method lives here
+  move = (book, shelf) => {
+    const newBooks = this.state.books.map((bk) => {
+      if (bk.id === book.id) {
+        bk.shelf = shelf;
+      }
+      return bk;
+    });
+    // console.log()
+
+    this.setState({
+      books: newBooks,
+    });
+  };
 
   render() {
     const { books } = this.state;
@@ -31,12 +47,14 @@ class BooksApp extends React.Component {
         <Route
           exact
           path="/"
-          render={() => <BookList shelves={this.shelves} books={books} />}
+          render={() => (
+            <BookList shelves={this.shelves} books={books} move={this.move} />
+          )}
         />
         <Route
           exact
           path="/search"
-          render={() => <BookSearch books={books} />}
+          render={() => <BookSearch books={books} move={this.move} />}
         />
 
         {this.state.showSearchPage ? (
@@ -327,12 +345,12 @@ class BooksApp extends React.Component {
 class BookList extends Component {
   render() {
     // render a shelves component (props will be 'currently reading', 'want to read' and 'read', and books)
-    const { shelves, books } = this.props;
+    const { shelves, books, move } = this.props;
     // console.log(this.props);
     return (
       <div className="list-books">
         <h1>MyReads</h1>
-        <BooksContent shelves={shelves} books={books} />
+        <BooksContent shelves={shelves} books={books} move={move} />
         <BookSearch />
       </div>
     );
@@ -341,14 +359,19 @@ class BookList extends Component {
 
 const BooksContent = (props) => {
   // get shelves and their books (if any)
-  const { shelves, books } = props;
+  const { shelves, books, move } = props;
   // console.log("BooksContent", props);
   return (
     <div className="list-books-content">
       <div>
         List of Books
         {shelves.map((shelf) => (
-          <BookShelf key={shelf.id} books={books} bookshelf={shelf} />
+          <BookShelf
+            key={shelf.id}
+            books={books}
+            bookshelf={shelf}
+            move={move}
+          />
         ))}
       </div>
     </div>
@@ -356,7 +379,7 @@ const BooksContent = (props) => {
 };
 const BookShelf = (props) => {
   // Get all books and the bookshelf from props
-  const { books, bookshelf } = props;
+  const { books, bookshelf, move } = props;
   // console.log(props);
   // Filter the books in the bookshelf
   const booksFiltered = books.filter((book) => book.shelf === bookshelf.shelf);
@@ -367,7 +390,12 @@ const BookShelf = (props) => {
       <div className="bookshelf-books">
         <ol className="books-grid">
           {booksFiltered.map((book) => (
-            <Book key={book.id} book={book} bookshelf={bookshelf.shelf} />
+            <Book
+              key={book.id}
+              book={book}
+              bookshelf={bookshelf.shelf}
+              move={move}
+            />
           ))}
         </ol>
       </div>
@@ -376,8 +404,8 @@ const BookShelf = (props) => {
 };
 
 const Book = (props) => {
-  const { book, bookshelf } = props;
-  // console.log(props);
+  const { book, bookshelf, move } = props;
+  // console.log(move);
   return (
     <li>
       <div className="book">
@@ -390,7 +418,7 @@ const Book = (props) => {
               backgroundImage: `url(${book.imageLinks.smallThumbnail})`,
             }}
           />
-          <BookshelfChange book={book} bookshelf={bookshelf} />
+          <BookshelfChange book={book} bookshelf={bookshelf} move={move} />
         </div>
         <div className="book-title">{book.title}</div>
         <div className="book-authors">
@@ -410,7 +438,9 @@ class BookshelfChange extends Component {
     shelf: this.props.bookshelf,
     book: this.props.book,
   };
+
   onChange = (e) => {
+    console.log("previous", this.state.shelf);
     e.preventDefault();
     // Change shelf type
     this.setState({
@@ -420,7 +450,8 @@ class BookshelfChange extends Component {
     // console.log(this.state.shelf);
 
     // Move book
-    //TODO: Move book
+    // console.log(this.props.move);
+    this.props.move(this.state.book, e.target.value);
   };
 
   render() {
