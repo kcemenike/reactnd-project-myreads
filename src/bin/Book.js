@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 export const Book = (props) => {
   const { book, bookshelf, moveBookToShelf } = props;
-  //   console.log("book", props);
+  console.log("book", props);
   return (
     <li>
       <div className="book">
@@ -35,24 +35,24 @@ export const Book = (props) => {
 };
 
 class BookshelfChange extends Component {
-  // console.log(this.props);
   // state stores current shelf
   state = {
     shelf: this.props.bookshelf,
-    book: this.props.book,
   };
 
   onChange = (e) => {
     // console.log("previous", this.state.shelf);
-    e.preventDefault();
+    // e.preventDefault();
     // Change shelf type
     this.setState({
       shelf: e.target.value,
     });
-    this.props.moveBookToShelf(this.state.book, e.target.value);
+    this.props.moveBookToShelf(this.props.book, e.target.value);
   };
 
   render() {
+    // console.log(this.state);
+    console.log("bookshelfchange", this.props);
     return (
       <div className="book-shelf-changer">
         <select value={this.state.shelf} onChange={this.onChange}>

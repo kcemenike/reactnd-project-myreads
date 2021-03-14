@@ -1,5 +1,6 @@
 {
   "name": "myreads-app",
+  "homepage": "http://reactnd.pydata.co/myreads",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
