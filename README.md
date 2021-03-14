@@ -11,7 +11,7 @@ An uncategorized book is tagged as 'None' by default
 There is also a catalog of books that can be searched by author and title  
 Search terms are however limited to the terms in [SEARCH_TERMS.md](SEARCH_TERMS.md)
 
-Demo is currently hosted [here](reactnd.pydata.co/myreads)
+Demo is currently hosted [here](http://reactnd.pydata.co/myreads)
 
 ## Installation
 
