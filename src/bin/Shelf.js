@@ -32,7 +32,6 @@ export const BooksContent = (props) => {
   return (
     <div className="list-books-content">
       <div>
-        List of Books
         {shelves.map((shelf) => (
           <BookShelf
             key={shelf.id}
@@ -49,7 +48,7 @@ export const BooksContent = (props) => {
 export const BookShelf = (props) => {
   // Get all books and the bookshelf from props
   const { books, bookshelf, moveBookToShelf } = props;
-  // console.log(props);
+  // console.log("bookshelf", props);
   // Filter the books in the bookshelf
   const booksFiltered = books.filter((book) => book.shelf === bookshelf.shelf);
   // console.log(booksFiltered);

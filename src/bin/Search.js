@@ -5,12 +5,19 @@ import Book from "./Book";
 
 class BookSearch extends Component {
   render() {
-    const { searchedBooks, search, clearSearch, moveBookToShelf } = this.props;
+    const {
+      searchedBooks,
+      books,
+      search,
+      clearSearch,
+      moveBookToShelf,
+    } = this.props;
     return (
       <div className="search-books">
         <SearchBar search={search} clearSearch={clearSearch} />
         <SearchResults
           searchedBooks={searchedBooks}
+          books={books}
           moveBookToShelf={moveBookToShelf}
         />
       </div>
@@ -58,14 +65,35 @@ export const SearchBar = (props) => {
 };
 
 export const SearchResults = (props) => {
-  // console.log("searchedBooks", props);
-  const { searchedBooks, moveBookToShelf } = props;
+  const { searchedBooks, books, moveBookToShelf } = props;
+  let booksFiltered = [];
+  if (searchedBooks.error) {
+    booksFiltered = [];
+  } else {
+    booksFiltered = searchedBooks.map((book) => {
+      books.map((bk) => {
+        if (bk.id === book.id) {
+          book.shelf = bk.shelf;
+        }
+        return bk;
+      });
+      return book;
+    });
+  }
+  console.log("searchResults", props);
+
+  // console.log("booksFiltered", booksFiltered);
   return (
     <div className="search-books-results">
       <ol className="books-grid">
-        {!searchedBooks.error &&
-          searchedBooks.map((book) => (
-            <Book key={book.id} book={book} moveBookToShelf={moveBookToShelf} />
+        {!booksFiltered.error &&
+          booksFiltered.map((book) => (
+            <Book
+              key={book.id}
+              book={book}
+              moveBookToShelf={moveBookToShelf}
+              bookshelf={book.shelf ? book.shelf : "none"}
+            />
           ))}
       </ol>
     </div>

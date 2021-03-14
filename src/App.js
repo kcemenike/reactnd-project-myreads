@@ -19,7 +19,7 @@ class BooksApp extends React.Component {
     showSearchPage: false,
     books: [],
     searchedBooks: [],
-    query: "",
+    // query: "",
   };
   componentDidMount = () => {
     BooksAPI.getAll().then((books) => {
@@ -31,13 +31,13 @@ class BooksApp extends React.Component {
   // So the move method lives here
   moveBookToShelf = (book, shelf) => {
     BooksAPI.update(book, shelf);
-    const newBooks = this.state.books.map((bk) => {
-      if (bk.id === book.id) {
-        bk.shelf = shelf;
-      }
-      return bk;
-    });
+    let newBooks = [];
+    newBooks = this.state.books.filter((bk) => bk.id !== book.id);
 
+    if (shelf !== "none") {
+      book.shelf = shelf;
+      newBooks = newBooks.concat(book);
+    }
     this.setState({
       books: newBooks,
     });
@@ -57,6 +57,7 @@ class BooksApp extends React.Component {
   };
 
   render() {
+    // console.log(process.env.NODE_ENV);
     const { books, searchedBooks } = this.state;
     // console.log("bookapp", this.state);
     // console.log(books);
@@ -79,6 +80,7 @@ class BooksApp extends React.Component {
           render={() => (
             <BookSearch // render the Search part here
               searchedBooks={searchedBooks}
+              books={books}
               moveBookToShelf={this.moveBookToShelf}
               search={this.updateQuery}
               clearSearch={this.clearQuery}
